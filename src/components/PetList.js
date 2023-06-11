@@ -1,13 +1,37 @@
-import React, { useState, useSyncExternalStore } from "react";
-import petsData from "../petsData";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
+//import petsData from "../petsData";  since i replace const petList = petsData with const petList = pets
 import PetItem from "./PetItem";
 import Modal from "./Modal";
+import { getPets } from "../api/pets";
 
 const PetList = () => {
   const [query, setQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const petList = petsData
+  //https://react.dev/reference/react/useEffect
+  // useLayoutEffect(() => {
+  //   first -------- compnnet on mount
+  //   return () => {
+  //     second ----- compnent unmount
+  //   };
+  // }, [third]) ---- statrted once only when the component mounted
+
+  const [pets, setPets] = useState([]); // useState 1 empty Array so we can overwrite it with new petsList
+  //and array so we can  do filter @2
+
+  const callApi = async () => {
+    const response = await getPets();
+    setPets(response.data); // data is an array in petsData.js -- check console.log(respone) and console.log(response.data)
+  };
+
+  // calling the server when the component mounted -- useEffect needed and function callApi is a must
+  // async can not be input to useEffect that is why we created outside
+  useEffect(() => {
+    callApi();
+  }, []);
+
+  //@2
+  const petList = pets
     .filter((pet) => pet.name.toLowerCase().includes(query.toLowerCase()))
     .map((pet) => <PetItem pet={pet} key={pet.id} />);
   return (

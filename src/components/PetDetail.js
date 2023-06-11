@@ -1,7 +1,44 @@
 import React from "react";
 import petsData from "../petsData";
+import { useState, useEffect } from "react";
+import { Navigate, useParams } from "react-router-dom";
+import { getPet, updatePet } from "../api/pets";
+
 const PetDetail = () => {
-  const pet = petsData[0];
+  //const pet = petsData[0];
+  const { petId } = useParams();
+  const [pet, setPet] = useState({});
+  //const pet = petsData.find((pet) => pet.id == petId);
+
+  const callApi = async () => {
+    const response = await getPet(petId);
+    setPet(response);
+  };
+
+  const callApiDeletePet = async () => {
+    const response = await deletePet(petId);
+    setPet(response);
+  };
+
+  const handleUpdate = () => {
+    updatePet(pet.id, pet.name, pet.type, pet.image, pet.adopted);
+  };
+
+  const handelDelete = () => {
+    deletePet(petId);
+  };
+
+  useEffect(() => {
+    callApi();
+  }, []);
+
+  useEffect(() => {
+    callApiDeletePet();
+  }, []);
+
+  if (!pet) {
+    <h1>There is no pet with the id: ${petId}</h1>;
+  }
   return (
     <div className="bg-[#F9E3BE] w-screen h-[100vh] flex justify-center items-center">
       <div className="border border-black rounded-md w-[70%] h-[70%] overflow-hidden flex flex-col md:flex-row p-5">
@@ -17,11 +54,17 @@ const PetDetail = () => {
           <h1>Type: {pet.type}</h1>
           <h1>adopted: {pet.adopted}</h1>
 
-          <button className="w-[70px] border border-black rounded-md  hover:bg-green-400 mb-5">
+          <button
+            onClick={handleUpdate}
+            className="w-[70px] border border-black rounded-md  hover:bg-green-400 mb-5"
+          >
             Adobt
           </button>
 
-          <button className="w-[70px] border border-black rounded-md  hover:bg-red-400">
+          <button
+            onClick={handelDelete}
+            className="w-[70px] border border-black rounded-md  hover:bg-red-400"
+          >
             Delete
           </button>
         </div>
